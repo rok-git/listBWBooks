@@ -11,11 +11,22 @@
                     zbuydate \
                 from zauthor, zbookserver \
                 where zauthor.zbook = zbookserver.z_pk;"
+#define DATE_FORMAT @"yyyy-MM-dd HH:mm:ss"
+#define DEF_TZ @"JST"
+#define BW_DATE_EPOCH @"2001-01-01"
+
 
 int
 main()
 {
     @autoreleasepool{
+        NSError *err = nil;
+        NSString *str = BW_DATE_EPOCH;  // Epoch of BOOKWALKER's buydate ?
+        NSDataDetector *det = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeDate error: &err];
+        NSTextCheckingResult *match = [det firstMatchInString: str options: 0 range: NSMakeRange(0, [str length])];
+        NSDate *refDate = [match date];
+        NSDate *date;
+
         NSFileHandle *fout = [NSFileHandle fileHandleWithStandardOutput];
         SQLite3DB *db = [[SQLite3DB alloc] init];
         if([db connectDB: dbFile]){
@@ -24,11 +35,21 @@ main()
                 NSLog(@"preparing statment failed");
                 exit(1);
             }
-    //        NSLog(@"preparing statment SUCCEEDED");
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = DATE_FORMAT;
+            dateFormatter.timeZone = [NSTimeZone timeZoneWithName: DEF_TZ];
             NSArray *data;
             NSString *outStr;
             while((data = [stmt step])){
-                outStr = [NSString stringWithFormat: @"%@, %@, %@, %@, %@, %@\n", data[0], data[1], data[2], data[3], data[4], data[5]];
+                date = [NSDate dateWithTimeInterval: [data[5] doubleValue] sinceDate: refDate];
+                outStr = [NSString
+                    stringWithFormat: @"\"%@\", \"%@\", \"%@\", \"%@\", \"%@\", \"%@\"\n",
+                    [data[0] stringByReplacingOccurrencesOfString: @"\"" withString: @"\"\""],
+                    [data[1] stringByReplacingOccurrencesOfString: @"\"" withString: @"\"\""],
+                    [data[2] stringByReplacingOccurrencesOfString: @"\"" withString: @"\"\""],
+                    [data[3] stringByReplacingOccurrencesOfString: @"\"" withString: @"\"\""],
+                    [data[4] stringByReplacingOccurrencesOfString: @"\"" withString: @"\"\""],
+                    [[dateFormatter stringFromDate: date] stringByReplacingOccurrencesOfString: @"\"" withString: @"\"\""]];
                 [fout writeData: [outStr dataUsingEncoding: NSUTF8StringEncoding]];;
             }
             [stmt done];
