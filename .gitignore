@@ -1,3 +1,5 @@
 *.o
 /listBWBooks
 gomi/
+/*.csv
+.DS_Store
