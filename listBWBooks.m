@@ -43,7 +43,7 @@ main()
             while((data = [stmt step])){
                 date = [NSDate dateWithTimeInterval: [data[5] doubleValue] sinceDate: refDate];
                 outStr = [NSString
-                    stringWithFormat: @"\"%@\", \"%@\", \"%@\", \"%@\", \"%@\", \"%@\"\n",
+                    stringWithFormat: @"\"%@\",\"%@\",\"%@\",\"%@\",\"%@\",\"%@\"\n",
                     [data[0] stringByReplacingOccurrencesOfString: @"\"" withString: @"\"\""],
                     [data[1] stringByReplacingOccurrencesOfString: @"\"" withString: @"\"\""],
                     [data[2] stringByReplacingOccurrencesOfString: @"\"" withString: @"\"\""],
