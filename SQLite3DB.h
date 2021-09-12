@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <sqlite3.h>
 
-#define MAX_SQL_LEN 512
+#define MAX_SQL_LEN 1024
 
 @interface SQLite3Stmt : NSObject {
     sqlite3_stmt * ppStmt;
