@@ -3,3 +3,4 @@
 gomi/
 /*.csv
 .DS_Store
+/dbformat.sql
